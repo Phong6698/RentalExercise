@@ -98,7 +98,6 @@ public class Connection {
 			
 			ps.executeUpdate();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally{
 			closeCon();
@@ -130,7 +129,6 @@ public class Connection {
 	
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally{
 			closeCon();

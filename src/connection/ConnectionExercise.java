@@ -2,17 +2,15 @@ package connection;
 
 import java.sql.*;
 
-import model.User;
-
 public class ConnectionExercise {
 	
 	private static ConnectionExercise instance = new ConnectionExercise();
 	
 	private final String DRIVER = "com.mysql.jdbc.Driver";
 	
-	private final String URL = "";
-	private final String USER = "";
-	private final String PASS = "";
+	private final String URL = "jdbc:mysql://localhost/rental";
+	private final String USER = "root";
+	private final String PASS = "1234";
 	
 	private java.sql.Connection con = null;
 	private Statement stmt = null;
@@ -23,14 +21,11 @@ public class ConnectionExercise {
 		
 	}
 	
-	
 	public static ConnectionExercise getInstance(){
 		return instance;
 	}
 	
-	
-	public void setCon(){
-		
+	public void openCon(){
 		try {
 			Class.forName(DRIVER);
 			con = DriverManager.getConnection(URL, USER, PASS);
@@ -39,61 +34,62 @@ public class ConnectionExercise {
 			e.printStackTrace();
 		}
 		
-				
 	}
 	
 	public void closeCon(){
 		try {
-			con.close();
-			stmt.close();
-			ps.close();
-			rs.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-	
-	public void getUsers(){
-		setCon();
-		
-		try {
-			stmt = con.createStatement();
-			rs = stmt.executeQuery("SELECT * FROM user");
-			
-			while(rs.next()){
-				String id = rs.getString("ID_User");
-
+			if(con!=null){
+				con.close();
+			}else if(stmt!=null){
+				stmt.close();
+			}else if(ps!=null){
+				ps.close();
+			}else if(rs!=null){
+				rs.close();
 			}
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
-			closeCon();
 		}
-		
-		
-		
 	}
 	
-	public void registerUser(User user){
-		 setCon();
+	public void getAllUsers(){
+		openCon();
 		try {
-			ps = con.prepareStatement("INSERT INTO user VALUES (?,?,?)");
-			ps.setString(1, null);
-			ps.setString(2, user.getFirstname());
-			ps.setString(3, user.getLastname());
-			
-			ps.executeUpdate();
-			
+			stmt = con.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM users;");
+			while(rs.next()){
+				System.out.println(rs.getString("ID_User"));
+			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
+		}finally{
+			closeCon();
+		}
+		
+	}
+	
+	public void registerUser(){
+		openCon();
+		try {
+			ps = con.prepareStatement("INSERT INTO users VALUES(?,?,?,?,?,?,?,?,?,?,?)");
+			ps.setString(1, null);
+			ps.setString(2, "wdfw");
+			ps.setString(3, "nufwfwll");
+			ps.setString(4, "nfwull");
+			ps.setString(5, "nfwull");
+			ps.setString(6, "nfwull");
+			ps.setString(7, "nusall");
+			ps.setString(8, "nuall");
+			ps.setString(9, "nudll");
+			ps.setString(10, "nucll");
+			ps.setString(11, "nuvll");
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally{
 			closeCon();
 		}
 	}
-	
 }
