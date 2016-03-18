@@ -3,10 +3,17 @@ package view;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+
+import connection.Connection;
+import model.User;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JPasswordField;
 
-public class Registration extends JFrame{
+public class Registration extends JFrame implements ActionListener{
 
 	/**
 	 * 
@@ -113,10 +120,12 @@ public class Registration extends JFrame{
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.setBounds(154, 305, 77, 23);
 		getContentPane().add(cancelButton);
+		cancelButton.addActionListener(this);
 		
 		JButton registerButton = new JButton("Register");
-		registerButton.setBounds(253, 305, 77, 23);
+		registerButton.setBounds(241, 305, 89, 23);
 		getContentPane().add(registerButton);
+		registerButton.addActionListener(this);
 		
 		password1 = new JPasswordField();
 		password1.setBounds(154, 243, 173, 20);
@@ -129,4 +138,32 @@ public class Registration extends JFrame{
 		
 		this.setVisible(true);
 	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		if(arg0.getActionCommand().equals("Cancel")){
+			this.dispose();
+			
+		}else if(arg0.getActionCommand().equals("Register")){
+			if(this.password1.getText().equals(this.password2.getText())){
+				User user = new User();
+				user.setFirstname(this.firstname.getText());
+				user.setLastname(this.lastname.getText());
+				user.setAddress(this.address1.getText());
+				user.setAddress2(this.address2.getText());
+				user.setZipCode(this.zip.getText());
+				user.setCity(this.city.getText());
+				user.setTelephone(this.telephone.getText());
+				user.setEmail(this.email.getText());
+				user.setCreditCardNumber(this.creditCardNumber.getText());
+				user.setPassword(this.password1.getText());
+				
+				System.out.println(user.toString());
+				
+				Connection.getInstance().registerUser(user);
+			}
+		}
+		
+	}
+	
 }

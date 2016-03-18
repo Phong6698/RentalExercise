@@ -2,25 +2,36 @@ package connection;
 
 import java.sql.*;
 
+import connection.Connection;
 import model.User;
 
 public class Connection {
 	
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://localhost/rental";
-	static final String USER = "root";
-	static final String PASS = "1234";
+	private static Connection instance = new Connection();
+	
+	private final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+	
+	private final String DB_URL = "jdbc:mysql://localhost/rental";
+	private final String USER = "root";
+	private final String PASS = "1234";
 	
 	protected java.sql.Connection con = null;
 	protected Statement stmt = null;
 	protected PreparedStatement ps = null;
 	protected ResultSet rs = null;
 	
+	private Connection() {
+	}
+
+	public static Connection getInstance() {
+		return Connection.instance;
+	}
 	
-	public void getCon(){
+	public void setCon(){
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			Class.forName(JDBC_DRIVER);
 			con = DriverManager.getConnection(DB_URL, USER, PASS);
+			
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
@@ -28,16 +39,23 @@ public class Connection {
 	
 	public void closeCon(){
 		try {
-			con.close();
-			stmt.close();
-			rs.close();
+			if(con != null){
+				con.close();
+			}else if(stmt != null){
+				stmt.close();
+			}else if(ps != null){
+				ps.close();
+			}else if(rs != null){
+				rs.close();
+			}
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public void getUsers(){
-		getCon();
+		setCon();
 		try {
 			stmt = con.createStatement();
 			rs = stmt.executeQuery("SELECT * FROM users");
@@ -50,17 +68,18 @@ public class Connection {
 			      System.out.println(firstname);
 			}
 			
-			closeCon();
 			      
 		} catch (SQLException e) {
 			
 			e.printStackTrace();
+		} finally{
+			closeCon();
 		}
 	}
 	
 	public void registerUser(User user){
 		
-		getCon();
+		setCon();
 			
 		try {
 			ps = con.prepareStatement("INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?)");
@@ -81,8 +100,43 @@ public class Connection {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally{
+			closeCon();
 		}
 		
+		
+	}
+	
+	public boolean loginUser(String email, String password){
+		
+		boolean loginSuccess = false;
+		
+		setCon();
+			
+		try {
+			stmt = con.createStatement();
+			rs = stmt.executeQuery("SELECT * FROM users");
+			
+			
+			
+			while (rs.next()) {
+				
+				if(rs.getString("Email").equals(email) && rs.getString("Password").equals(password)){
+					loginSuccess = true;
+					break;
+				}else{
+					loginSuccess = false;
+				}
+	
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally{
+			closeCon();
+		}
+		
+		return loginSuccess;
 		
 	}
 	
